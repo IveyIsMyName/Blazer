@@ -1,0 +1,65 @@
+﻿@page "/dec2bin"
+@rendermode InteractiveServer
+
+<PageTitle>Dec to Bin</PageTitle>
+
+<h3>Конвертер: Десятичная -> Двоичная</h3>
+
+<div class="mb-3">
+    <label for="decimalInput" class="form-label">Десятичное число:</label>
+    <input @bind="decimalString" type="text" class="form-control" id="decimalInput" placeholder="Введите число" />
+</div>
+
+<button @onclick="ConvertToBinary" class="btn btn-primary">Конвертировать</button>
+
+@if (!string.IsNullOrEmpty(result))
+{
+    <div class="alert alert-info mt-3">
+        <strong>Результат:</strong> @result
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Ошибка:</strong> @errorMessage
+    </div>
+}
+
+@code {
+    private string decimalString = "";
+    private string result = "";
+    private string errorMessage = "";
+
+    private void ConvertToBinary()
+    {
+        errorMessage = ""; // Сбрасываем ошибку
+        result = ""; // Сбрасываем результат
+
+        // Проверяем, что ввод не пустой
+        if (string.IsNullOrWhiteSpace(decimalString))
+        {
+            errorMessage = "Введите число.";
+            return;
+        }
+
+        // Пытаемся преобразовать строку в число
+        if (long.TryParse(decimalString, out long decimalNumber))
+        {
+            // Проверяем, что число неотрицательное (для простоты)
+            if (decimalNumber < 0)
+            {
+                errorMessage = "Пожалуйста, введите неотрицательное число.";
+                return;
+            }
+
+            // Конвертируем в двоичную систему (2 - основание системы)
+            // и убираем ведущие нули (если они появятся)
+            result = Convert.ToString(decimalNumber, 2);
+        }
+        else
+        {
+            errorMessage = "Неверный формат числа. Введите целое число.";
+        }
+    }
+}

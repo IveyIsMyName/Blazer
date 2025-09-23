@@ -1,0 +1,61 @@
+﻿@page "/dec2hex"
+@rendermode InteractiveServer
+
+<PageTitle>Dec to Hex</PageTitle>
+
+<h3>Конвертер: Десятичная -> Шестнадцатеричная</h3>
+
+<div class="mb-3">
+    <label for="decimalInput" class="form-label">Десятичное число:</label>
+    <input @bind="decimalString" type="text" class="form-control" id="decimalInput" placeholder="Введите число" />
+</div>
+
+<button @onclick="ConvertToHex" class="btn btn-primary">Конвертировать</button>
+
+@if (!string.IsNullOrEmpty(result))
+{
+    <div class="alert alert-info mt-3">
+        <strong>Результат:</strong> @result
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Ошибка:</strong> @errorMessage
+    </div>
+}
+
+@code {
+    private string decimalString = "";
+    private string result = "";
+    private string errorMessage = "";
+
+    private void ConvertToHex()
+    {
+        errorMessage = "";
+        result = "";
+
+        if (string.IsNullOrWhiteSpace(decimalString))
+        {
+            errorMessage = "Введите число.";
+            return;
+        }
+
+        if (long.TryParse(decimalString, out long decimalNumber))
+        {
+            if (decimalNumber < 0)
+            {
+                errorMessage = "Пожалуйста, введите неотрицательное число.";
+                return;
+            }
+            // Конвертируем в шестнадцатеричную систему (16 - основание)
+            // ToUpper() делает буквы A-F заглавными
+            result = Convert.ToString(decimalNumber, 16).ToUpper();
+        }
+        else
+        {
+            errorMessage = "Неверный формат числа. Введите целое число.";
+        }
+    }
+}

@@ -12,7 +12,7 @@
 			{
 				factorial *= i;
 			}
-			//return factorial;
+			
 		}
 	}
 }

@@ -1,0 +1,64 @@
+﻿@page "/hex2dec"
+@rendermode InteractiveServer
+
+<PageTitle>Hex to Dec</PageTitle>
+
+<h3>Конвертер: Шестнадцатеричная -> Десятичная</h3>
+
+<div class="mb-3">
+    <label for="hexInput" class="form-label">Шестнадцатеричное число:</label>
+    <input @bind="hexString" type="text" class="form-control" id="hexInput" placeholder="Введите hex число (0-9, A-F)" />
+</div>
+
+<button @onclick="ConvertToDecimal" class="btn btn-primary">Конвертировать</button>
+
+@if (!string.IsNullOrEmpty(result))
+{
+    <div class="alert alert-info mt-3">
+        <strong>Результат:</strong> @result
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Ошибка:</strong> @errorMessage
+    </div>
+}
+
+@code {
+    private string hexString = "";
+    private string result = "";
+    private string errorMessage = "";
+
+    private void ConvertToDecimal()
+    {
+        errorMessage = "";
+        result = "";
+
+        if (string.IsNullOrWhiteSpace(hexString))
+        {
+            errorMessage = "Введите шестнадцатеричное число.";
+            return;
+        }
+
+        try
+        {
+            // Второй параметр (16) указывает, что число в шестнадцатеричной системе.
+            long decimalNumber = Convert.ToInt64(hexString, 16);
+            result = decimalNumber.ToString();
+        }
+        catch (FormatException)
+        {
+            errorMessage = "Неверный формат. Шестнадцатеричное число должно содержать символы 0-9, A-F.";
+        }
+        catch (OverflowException)
+        {
+            errorMessage = "Число слишком большое или слишком маленькое.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Произошла ошибка: {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,65 @@
+﻿@page "/bin2dec"
+@rendermode InteractiveServer
+
+<PageTitle>Bin to Dec</PageTitle>
+
+<h3>Конвертер: Двоичная -> Десятичная</h3>
+
+<div class="mb-3">
+    <label for="binaryInput" class="form-label">Двоичное число:</label>
+    <input @bind="binaryString" type="text" class="form-control" id="binaryInput" placeholder="Введите двоичное число (0 и 1)" />
+</div>
+
+<button @onclick="ConvertToDecimal" class="btn btn-primary">Конвертировать</button>
+
+@if (!string.IsNullOrEmpty(result))
+{
+    <div class="alert alert-info mt-3">
+        <strong>Результат:</strong> @result
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Ошибка:</strong> @errorMessage
+    </div>
+}
+
+@code {
+    private string binaryString = "";
+    private string result = "";
+    private string errorMessage = "";
+
+    private void ConvertToDecimal()
+    {
+        errorMessage = "";
+        result = "";
+
+        if (string.IsNullOrWhiteSpace(binaryString))
+        {
+            errorMessage = "Введите двоичное число.";
+            return;
+        }
+
+        try
+        {
+            // Convert.ToInt32 может выбросить исключение, если строка содержит не только 0 и 1.
+            // Второй параметр (2) указывает, что число в двоичной системе.
+            long decimalNumber = Convert.ToInt64(binaryString, 2);
+            result = decimalNumber.ToString();
+        }
+        catch (FormatException)
+        {
+            errorMessage = "Неверный формат. Двоичное число должно содержать только символы 0 и 1.";
+        }
+        catch (OverflowException)
+        {
+            errorMessage = "Число слишком большое или слишком маленькое.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Произошла ошибка: {ex.Message}";
+        }
+    }
+}
