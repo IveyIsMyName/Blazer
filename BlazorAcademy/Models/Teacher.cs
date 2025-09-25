@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace BlazorAcademy.Models
 {
-	public class Direction
+	public class Teacher:Human
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public byte direction_id { get; set; }
+		public short teacher_id { get; set; }
 		[Required]
-		public string? direction_name { get; set; }
+		public DateOnly work_since { get; set; }
+		[Required]
+		public decimal rate { get; set; }
 	}
 }
