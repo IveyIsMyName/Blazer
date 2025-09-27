@@ -12,34 +12,75 @@
 <h1>Index</h1>
 
 <p>
-    <a href="teachers/create">Create New</a>
+	<a href="teachers/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Teachers">
-    <PropertyColumn Sortable="true" Title="Фамилия" Property="teacher => teacher.last_name" />
-    <PropertyColumn Sortable="true" Title="Имя" Property="teacher => teacher.first_name" />
-    <PropertyColumn Sortable="true" Title="Отчество" Property="teacher => teacher.middle_name" />
-    <PropertyColumn Sortable="true" Title="Дата рождения" Property="teacher => teacher.birth_date" />
-    <PropertyColumn Sortable="true" Title="E-mail" Property="teacher => teacher.email" />
-    <PropertyColumn Sortable="true" Title="Телефон" Property="teacher => teacher.phone" />
-    <PropertyColumn Sortable="true" Title="Фото" Property="teacher => teacher.photo" />
-    <PropertyColumn Sortable="true" Title="Работает с" Property="teacher => teacher.work_since" />
-    <PropertyColumn Sortable="true" Title="Ставка за пару" Property="teacher => teacher.rate" />
-
-    <TemplateColumn Context="teacher">
-        <a href="@($"teachers/edit?teacher_id={teacher.teacher_id}")">Edit</a> |
-        <a href="@($"teachers/details?teacher_id={teacher.teacher_id}")">Details</a> |
-        <a href="@($"teachers/delete?teacher_id={teacher.teacher_id}")">Delete</a>
-    </TemplateColumn>
+	<PropertyColumn Sortable="true" Title="Фамилия" Property="teacher => teacher.last_name" />
+	<PropertyColumn Sortable="true" Title="Имя" Property="teacher => teacher.first_name" />
+	<PropertyColumn Sortable="true" Title="Отчество" Property="teacher => teacher.middle_name" />
+	@* <PropertyColumn Sortable="true" Title="Дата рождения" Property="teacher => teacher.birth_date" /> *@
+	<TemplateColumn Sortable="true" Title="Возраст" Context="teacher">
+		<div>@CalculateAge(teacher.birth_date)</div>
+	</TemplateColumn>
+	<PropertyColumn Sortable="true" Title="E-mail" Property="teacher => teacher.email" />
+	<PropertyColumn Sortable="true" Title="Телефон" Property="teacher => teacher.phone" />
+	<PropertyColumn Sortable="true" Title="Фото" Property="teacher => teacher.photo" />
+	@* <PropertyColumn Sortable="true" Title="Работает с" Property="teacher => teacher.work_since" /> *@
+	<PropertyColumn Sortable="true" Title="Ставка за пару" Property="teacher => teacher.rate" />
+	<TemplateColumn Sortable="true" Title="Опыт работы" Context="teacher">
+		<div>@CalculateExperience(teacher.work_since)</div>
+	</TemplateColumn>
+	<TemplateColumn Context="teacher">
+		<a href="@($"teachers/edit?teacher_id={teacher.teacher_id}")">Edit</a> |
+		<a href="@($"teachers/details?teacher_id={teacher.teacher_id}")">Details</a> |
+		<a href="@($"teachers/delete?teacher_id={teacher.teacher_id}")">Delete</a>
+	</TemplateColumn>
 </QuickGrid>
 
 @code {
-    private BlazorAcademyContext context = default!;
+	private BlazorAcademyContext context = default!;
 
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
-    }
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+	}
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+	//Метод для вычисления возраста
+	private string CalculateAge(DateOnly? birthDate)
+	{
+		if (!birthDate.HasValue)
+			return "Не указано";
+
+		var today = DateOnly.FromDateTime(DateTime.Today);
+		var age = today.Year - birthDate.Value.Year;
+
+		if (birthDate.Value > today.AddYears(-age))
+			age--;
+
+		return $"{age} лет";
+	}
+
+	//Метод для вычисления опыта работы
+	private string CalculateExperience(DateOnly? workSince)
+	{
+		if (!workSince.HasValue)
+			return "Не указано";
+
+		var today = DateOnly.FromDateTime(DateTime.Today);
+		var experience = today.Year - workSince.Value.Year;
+
+		// Проверяем, был ли уже день начала работы в этом году
+		if (workSince.Value > today.AddYears(-experience))
+			experience--;
+
+		return experience switch
+		{
+			1 => "1 год",
+			2 or 3 or 4 => $"{experience} года",
+			_ => $"{experience} лет"
+		};
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
