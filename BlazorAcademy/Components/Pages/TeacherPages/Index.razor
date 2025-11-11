@@ -20,7 +20,7 @@
 	<PropertyColumn Sortable="true" Title="Имя" Property="teacher => teacher.first_name" />
 	<PropertyColumn Sortable="true" Title="Отчество" Property="teacher => teacher.middle_name" />
 	@* <PropertyColumn Sortable="true" Title="Дата рождения" Property="teacher => teacher.birth_date" /> *@
-	<TemplateColumn Sortable="true" Title="Возраст" Context="teacher">
+	<TemplateColumn Sortable="true" Title="Возраст"  Context="teacher">
 		<div>@CalculateAge(teacher.birth_date)</div>
 	</TemplateColumn>
 	<PropertyColumn Sortable="true" Title="E-mail" Property="teacher => teacher.email" />
@@ -54,7 +54,7 @@
 
 		var today = DateOnly.FromDateTime(DateTime.Today);
 		var age = today.Year - birthDate.Value.Year;
-
+		
 		if (birthDate.Value > today.AddYears(-age))
 			age--;
 
